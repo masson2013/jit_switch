@@ -5,15 +5,9 @@ module jit_crossbar#
   parameter integer NUM_ACCs = 2
 )
 (
-  output  wire             sCMD_tready ,
-  input   wire             sCMD_tvalid ,
-  input   wire  [31 : 0]   sCMD_tdata  ,
-
-  input   wire             mRSP_tready ,
-  output  wire             mRSP_tvalid ,
-  output  wire  [31 : 0]   mRSP_tdata  ,
   // -----------------------------------
-  output  wire  [ 3 : 0]   CONF1       ,
+  input   wire  [ 3 : 0]   CONF1_A     ,
+  input   wire  [ 3 : 0]   CONF1_B     ,
 
   output  wire             sC1_tready  ,
   input   wire             sC1_tvalid  ,
@@ -27,7 +21,8 @@ module jit_crossbar#
   output  wire             mB1_tvalid  ,
   output  wire  [31 : 0]   mB1_tdata   ,
   // -----------------------------------
-  output  wire  [ 3 : 0]   CONF2       ,
+  input   wire  [ 3 : 0]   CONF2_A     ,
+  input   wire  [ 3 : 0]   CONF2_B     ,
 
   output  wire             sC2_tready  ,
   input   wire             sC2_tvalid  ,
@@ -41,7 +36,8 @@ module jit_crossbar#
   output  wire             mB2_tvalid  ,
   output  wire  [31 : 0]   mB2_tdata   ,
   // -----------------------------------
-  output  wire  [ 3 : 0]   CONF3       ,
+  input   wire  [ 3 : 0]   CONF3_A     ,
+  input   wire  [ 3 : 0]   CONF3_B     ,
 
   output  wire             sC3_tready  ,
   input   wire             sC3_tvalid  ,
@@ -55,7 +51,8 @@ module jit_crossbar#
   output  wire             mB3_tvalid  ,
   output  wire  [31 : 0]   mB3_tdata   ,
   // -----------------------------------
-  output  wire  [ 3 : 0]   CONF4       ,
+  input   wire  [ 3 : 0]   CONF4_A     ,
+  input   wire  [ 3 : 0]   CONF4_B     ,
 
   output  wire             sC4_tready  ,
   input   wire             sC4_tvalid  ,
@@ -69,7 +66,8 @@ module jit_crossbar#
   output  wire             mB4_tvalid  ,
   output  wire  [31 : 0]   mB4_tdata   ,
   // -----------------------------------
-  output  wire  [ 3 : 0]   CONF5       ,
+  input   wire  [ 3 : 0]   CONF5_A     ,
+  input   wire  [ 3 : 0]   CONF5_B     ,
 
   output  wire             sC5_tready  ,
   input   wire             sC5_tvalid  ,
@@ -83,7 +81,8 @@ module jit_crossbar#
   output  wire             mB5_tvalid  ,
   output  wire  [31 : 0]   mB5_tdata   ,
   // -----------------------------------
-  output  wire  [ 3 : 0]   CONF6       ,
+  input   wire  [ 3 : 0]   CONF6_A     ,
+  input   wire  [ 3 : 0]   CONF6_B     ,
 
   output  wire             sC6_tready  ,
   input   wire             sC6_tvalid  ,
@@ -97,7 +96,8 @@ module jit_crossbar#
   output  wire             mB6_tvalid  ,
   output  wire  [31 : 0]   mB6_tdata   ,
   // -----------------------------------
-  output  wire  [ 3 : 0]   CONF7       ,
+  input   wire  [ 3 : 0]   CONF7_A     ,
+  input   wire  [ 3 : 0]   CONF7_B     ,
 
   output  wire             sC7_tready  ,
   input   wire             sC7_tvalid  ,
@@ -111,7 +111,8 @@ module jit_crossbar#
   output  wire             mB7_tvalid  ,
   output  wire  [31 : 0]   mB7_tdata   ,
   // -----------------------------------
-  output  wire  [ 3 : 0]   CONF8       ,
+  input   wire  [ 3 : 0]   CONF8_A     ,
+  input   wire  [ 3 : 0]   CONF8_B     ,
 
   output  wire             sC8_tready  ,
   input   wire             sC8_tvalid  ,
@@ -137,14 +138,6 @@ module jit_crossbar#
 //
 generate if (NUM_ACCs == 2) begin
 
-  wire              w1t2_tready;
-  wire              w1t2_tvalid;
-  wire   [31 : 0]   w1t2_tdata ;
-  wire   [ 3 : 0]   wACC1_CONFA;
-  wire   [ 3 : 0]   wACC1_CONFB;
-  wire   [ 3 : 0]   wACC2_CONFA;
-  wire   [ 3 : 0]   wACC2_CONFB;
-
   wire              w111_tready;
   wire              w112_tready;
   wire              w121_tready;
@@ -156,21 +149,6 @@ generate if (NUM_ACCs == 2) begin
   wire              w221_tready;
   wire              w222_tready;
   assign            sC2_tready = w211_tready | w212_tready | w221_tready | w222_tready;
-
-
-  jit_cmd #(1) u_acc1_cmd(
-    .sR_tready  (sCMD_tready),
-    .sR_tvalid  (sCMD_tvalid),
-    .sR_tdata   (sCMD_tdata ),
-    .mR_tready  (w1t2_tready),
-    .mR_tvalid  (w1t2_tvalid),
-    .mR_tdata   (w1t2_tdata ),
-    .CONFA      (wACC1_CONFA),
-    .CONFB      (wACC1_CONFB),
-    .CONFC      (CONF1      ),
-    .ACLK       (ACLK       ),
-    .ARESETN    (ARESETN    )
-  );
 
   jit_mux #(NUM_ACCs) u_acc1_mA_mux(
     .s1_tready  (w111_tready),
@@ -200,7 +178,7 @@ generate if (NUM_ACCs == 2) begin
     .mO_tready  (mA1_tready ),
     .mO_tvalid  (mA1_tvalid ),
     .mO_tdata   (mA1_tdata  ),
-    .CONF       (wACC1_CONFA),
+    .CONF       (CONF1_A    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -233,21 +211,7 @@ generate if (NUM_ACCs == 2) begin
     .mO_tready  (mB1_tready ),
     .mO_tvalid  (mB1_tvalid ),
     .mO_tdata   (mB1_tdata  ),
-    .CONF       (wACC1_CONFB),
-    .ACLK       (ACLK       ),
-    .ARESETN    (ARESETN    )
-  );
-
-  jit_cmd #(2) u_acc2_cmd(
-    .sR_tready  (w1t2_tready),
-    .sR_tvalid  (w1t2_tvalid),
-    .sR_tdata   (w1t2_tdata ),
-    .mR_tready  (mRSP_tready),
-    .mR_tvalid  (mRSP_tvalid),
-    .mR_tdata   (mRSP_tdata ),
-    .CONFA      (wACC2_CONFA),
-    .CONFB      (wACC2_CONFB),
-    .CONFC      (CONF2      ),
+    .CONF       (CONF1_B    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -280,7 +244,7 @@ generate if (NUM_ACCs == 2) begin
     .mO_tready  (mA2_tready ),
     .mO_tvalid  (mA2_tvalid ),
     .mO_tdata   (mA2_tdata  ),
-    .CONF       (wACC2_CONFA),
+    .CONF       (CONF2_A    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -313,14 +277,13 @@ generate if (NUM_ACCs == 2) begin
     .mO_tready  (mB2_tready ),
     .mO_tvalid  (mB2_tvalid ),
     .mO_tdata   (mB2_tdata  ),
-    .CONF       (wACC2_CONFB),
+    .CONF       (CONF2_B    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
 
 end // NUM_ACCs == 2
 endgenerate
-
 //       _    ____ ____           _  _
 //      / \  / ___/ ___|___   _  | || |
 //     / _ \| |  | |   / __| (_) | || |_
@@ -328,27 +291,6 @@ endgenerate
 //   /_/   \_\____\____|___/ (_)    |_|
 //
 generate if (NUM_ACCs == 4) begin
-
-  wire              w1t2_tready;
-  wire              w1t2_tvalid;
-  wire   [31 : 0]   w1t2_tdata ;
-
-  wire              w2t3_tready;
-  wire              w2t3_tvalid;
-  wire   [31 : 0]   w2t3_tdata ;
-
-  wire              w3t4_tready;
-  wire              w3t4_tvalid;
-  wire   [31 : 0]   w3t4_tdata ;
-
-  wire   [ 3 : 0]   wACC1_CONFA;
-  wire   [ 3 : 0]   wACC1_CONFB;
-  wire   [ 3 : 0]   wACC2_CONFA;
-  wire   [ 3 : 0]   wACC2_CONFB;
-  wire   [ 3 : 0]   wACC3_CONFA;
-  wire   [ 3 : 0]   wACC3_CONFB;
-  wire   [ 3 : 0]   wACC4_CONFA;
-  wire   [ 3 : 0]   wACC4_CONFB;
 
   wire              w111_tready;
   wire              w112_tready;
@@ -373,20 +315,6 @@ generate if (NUM_ACCs == 4) begin
   wire              w421_tready;
   wire              w422_tready;
   assign            sC4_tready = w411_tready | w412_tready | w421_tready | w422_tready;
-
-  jit_cmd #(1) u_acc1_cmd(
-    .sR_tready  (sCMD_tready),
-    .sR_tvalid  (sCMD_tvalid),
-    .sR_tdata   (sCMD_tdata ),
-    .mR_tready  (w1t2_tready),
-    .mR_tvalid  (w1t2_tvalid),
-    .mR_tdata   (w1t2_tdata ),
-    .CONFA      (wACC1_CONFA),
-    .CONFB      (wACC1_CONFB),
-    .CONFC      (CONF1      ),
-    .ACLK       (ACLK       ),
-    .ARESETN    (ARESETN    )
-  );
 
   jit_mux #(NUM_ACCs) u_acc1_mA_mux(
     .s1_tready  (w111_tready),
@@ -416,7 +344,7 @@ generate if (NUM_ACCs == 4) begin
     .mO_tready  (mA1_tready ),
     .mO_tvalid  (mA1_tvalid ),
     .mO_tdata   (mA1_tdata  ),
-    .CONF       (wACC1_CONFA),
+    .CONF       (CONF1_A    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -449,21 +377,7 @@ generate if (NUM_ACCs == 4) begin
     .mO_tready  (mB1_tready ),
     .mO_tvalid  (mB1_tvalid ),
     .mO_tdata   (mB1_tdata  ),
-    .CONF       (wACC1_CONFB),
-    .ACLK       (ACLK       ),
-    .ARESETN    (ARESETN    )
-  );
-
-  jit_cmd #(2) u_acc2_cmd(
-    .sR_tready  (w1t2_tready),
-    .sR_tvalid  (w1t2_tvalid),
-    .sR_tdata   (w1t2_tdata ),
-    .mR_tready  (w2t3_tready),
-    .mR_tvalid  (w2t3_tvalid),
-    .mR_tdata   (w2t3_tdata ),
-    .CONFA      (wACC2_CONFA),
-    .CONFB      (wACC2_CONFB),
-    .CONFC      (CONF2      ),
+    .CONF       (CONF1_B    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -496,7 +410,7 @@ generate if (NUM_ACCs == 4) begin
     .mO_tready  (mA2_tready ),
     .mO_tvalid  (mA2_tvalid ),
     .mO_tdata   (mA2_tdata  ),
-    .CONF       (wACC2_CONFA),
+    .CONF       (CONF2_A    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -529,21 +443,7 @@ generate if (NUM_ACCs == 4) begin
     .mO_tready  (mB2_tready ),
     .mO_tvalid  (mB2_tvalid ),
     .mO_tdata   (mB2_tdata  ),
-    .CONF       (wACC2_CONFB),
-    .ACLK       (ACLK       ),
-    .ARESETN    (ARESETN    )
-  );
-
-  jit_cmd #(3) u_acc3_cmd(
-    .sR_tready  (w2t3_tready),
-    .sR_tvalid  (w2t3_tvalid),
-    .sR_tdata   (w2t3_tdata ),
-    .mR_tready  (w3t4_tready),
-    .mR_tvalid  (w3t4_tvalid),
-    .mR_tdata   (w3t4_tdata ),
-    .CONFA      (wACC3_CONFA),
-    .CONFB      (wACC3_CONFB),
-    .CONFC      (CONF3      ),
+    .CONF       (CONF2_B    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -576,7 +476,7 @@ generate if (NUM_ACCs == 4) begin
     .mO_tready  (mA3_tready ),
     .mO_tvalid  (mA3_tvalid ),
     .mO_tdata   (mA3_tdata  ),
-    .CONF       (wACC3_CONFA),
+    .CONF       (CONF3_A    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -609,21 +509,7 @@ generate if (NUM_ACCs == 4) begin
     .mO_tready  (mB3_tready ),
     .mO_tvalid  (mB3_tvalid ),
     .mO_tdata   (mB3_tdata  ),
-    .CONF       (wACC3_CONFB),
-    .ACLK       (ACLK       ),
-    .ARESETN    (ARESETN    )
-  );
-
-  jit_cmd #(4) u_acc4_cmd(
-    .sR_tready  (w3t4_tready),
-    .sR_tvalid  (w3t4_tvalid),
-    .sR_tdata   (w3t4_tdata ),
-    .mR_tready  (mRSP_tready),
-    .mR_tvalid  (mRSP_tvalid),
-    .mR_tdata   (mRSP_tdata ),
-    .CONFA      (wACC4_CONFA),
-    .CONFB      (wACC4_CONFB),
-    .CONFC      (CONF4      ),
+    .CONF       (CONF3_B    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -656,7 +542,7 @@ generate if (NUM_ACCs == 4) begin
     .mO_tready  (mA4_tready ),
     .mO_tvalid  (mA4_tvalid ),
     .mO_tdata   (mA4_tdata  ),
-    .CONF       (wACC4_CONFA),
+    .CONF       (CONF4_A    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -689,7 +575,7 @@ generate if (NUM_ACCs == 4) begin
     .mO_tready  (mB4_tready ),
     .mO_tvalid  (mB4_tvalid ),
     .mO_tdata   (mB4_tdata  ),
-    .CONF       (wACC4_CONFB),
+    .CONF       (CONF4_B    ),
     .ACLK       (ACLK       ),
     .ARESETN    (ARESETN    )
   );
@@ -697,7 +583,589 @@ generate if (NUM_ACCs == 4) begin
 end // NUM_ACCs == 4
 endgenerate
 
+//       _    ____ ____            ___
+//      / \  / ___/ ___|___   _   ( _ )
+//     / _ \| |  | |   / __| (_)  / _ \
+//    / ___ \ |__| |___\__ \  _  | (_) |
+//   /_/   \_\____\____|___/ (_)  \___/
+//
+generate if (NUM_ACCs == 8) begin
+  wire              w111_tready;
+  wire              w112_tready;
+  wire              w121_tready;
+  wire              w122_tready;
+  assign            sC1_tready = w111_tready | w112_tready | w121_tready | w122_tready;
 
+  wire              w211_tready;
+  wire              w212_tready;
+  wire              w221_tready;
+  wire              w222_tready;
+  assign            sC2_tready = w211_tready | w212_tready | w221_tready | w222_tready;
 
+  wire              w311_tready;
+  wire              w312_tready;
+  wire              w321_tready;
+  wire              w322_tready;
+  assign            sC3_tready = w311_tready | w312_tready | w321_tready | w322_tready;
+
+  wire              w411_tready;
+  wire              w412_tready;
+  wire              w421_tready;
+  wire              w422_tready;
+  assign            sC4_tready = w411_tready | w412_tready | w421_tready | w422_tready;
+
+  wire              w511_tready;
+  wire              w512_tready;
+  wire              w521_tready;
+  wire              w522_tready;
+  assign            sC5_tready = w511_tready | w512_tready | w521_tready | w522_tready;
+
+  wire              w611_tready;
+  wire              w612_tready;
+  wire              w621_tready;
+  wire              w622_tready;
+  assign            sC6_tready = w611_tready | w612_tready | w621_tready | w622_tready;
+
+  wire              w711_tready;
+  wire              w712_tready;
+  wire              w721_tready;
+  wire              w722_tready;
+  assign            sC7_tready = w711_tready | w712_tready | w721_tready | w722_tready;
+
+  wire              w811_tready;
+  wire              w812_tready;
+  wire              w821_tready;
+  wire              w822_tready;
+  assign            sC8_tready = w811_tready | w812_tready | w821_tready | w822_tready;
+
+  jit_mux #(NUM_ACCs) u_acc1_mA_mux(
+    .s1_tready  (w111_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w211_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w311_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w411_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w511_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w611_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w711_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w811_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF1_A    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc1_mB_mux(
+    .s1_tready  (w112_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w212_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w312_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w412_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w512_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w612_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w712_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w812_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF1_B    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc2_mA_mux(
+    .s1_tready  (w121_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w221_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w321_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w421_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w521_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w621_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w721_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w821_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF2_A    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc2_mB_mux(
+    .s1_tready  (w122_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w222_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w322_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w422_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w522_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w622_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w722_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w822_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF2_B    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc3_mA_mux(
+    .s1_tready  (w131_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w231_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w331_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w431_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w531_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w631_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w731_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w831_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF3_A    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc3_mB_mux(
+    .s1_tready  (w132_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w232_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w332_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w432_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w532_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w632_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w732_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w832_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF3_B    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc4_mA_mux(
+    .s1_tready  (w141_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w241_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w341_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w441_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w541_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w641_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w741_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w841_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF4_A    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc4_mB_mux(
+    .s1_tready  (w142_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w242_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w342_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w442_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w542_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w642_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w742_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w842_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF4_B    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc5_mA_mux(
+    .s1_tready  (w151_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w251_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w351_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w451_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w551_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w651_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w751_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w851_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF5_A    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc5_mB_mux(
+    .s1_tready  (w152_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w252_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w352_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w452_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w552_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w652_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w752_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w852_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF5_B    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc6_mA_mux(
+    .s1_tready  (w161_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w261_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w361_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w461_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w561_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w661_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w761_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w861_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF6_A    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc6_mB_mux(
+    .s1_tready  (w162_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w262_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w362_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w462_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w562_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w662_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w762_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w862_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF6_B    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc7_mA_mux(
+    .s1_tready  (w171_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w271_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w371_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w471_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w571_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w671_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w771_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w871_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF7_A    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc7_mB_mux(
+    .s1_tready  (w172_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w272_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w372_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w472_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w572_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w672_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w772_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w872_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF7_B    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc8_mA_mux(
+    .s1_tready  (w181_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w281_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w381_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w481_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w581_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w681_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w781_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w881_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF8_A    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+
+  jit_mux #(NUM_ACCs) u_acc8_mB_mux(
+    .s1_tready  (w182_tready),
+    .s1_tvalid  (sC1_tvalid ),
+    .s1_tdata   (sC1_tdata  ),
+    .s2_tready  (w282_tready),
+    .s2_tvalid  (sC2_tvalid ),
+    .s2_tdata   (sC2_tdata  ),
+    .s3_tready  (w382_tready),
+    .s3_tvalid  (sC3_tvalid ),
+    .s3_tdata   (sC3_tdata  ),
+    .s4_tready  (w482_tready),
+    .s4_tvalid  (sC4_tvalid ),
+    .s4_tdata   (sC4_tdata  ),
+    .s5_tready  (w582_tready),
+    .s5_tvalid  (sC5_tvalid ),
+    .s5_tdata   (sC5_tdata  ),
+    .s6_tready  (w682_tready),
+    .s6_tvalid  (sC6_tvalid ),
+    .s6_tdata   (sC6_tdata  ),
+    .s7_tready  (w782_tready),
+    .s7_tvalid  (sC7_tvalid ),
+    .s7_tdata   (sC7_tdata  ),
+    .s8_tready  (w882_tready),
+    .s8_tvalid  (sC8_tvalid ),
+    .s8_tdata   (sC8_tdata  ),
+    .mO_tready  (mA1_tready ),
+    .mO_tvalid  (mA1_tvalid ),
+    .mO_tdata   (mA1_tdata  ),
+    .CONF       (CONF8_B    ),
+    .ACLK       (ACLK       ),
+    .ARESETN    (ARESETN    )
+  );
+end // NUM_ACCs == 8
+endgenerate
 
 endmodule

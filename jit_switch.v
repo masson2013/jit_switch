@@ -204,7 +204,71 @@ module jit_switch #(
   output  wire             m8B_tvalid  ,
   output  wire  [31 : 0]   m8B_tdata   ,
   // -----------------------------------
-  input   wire             ACLK       ,
+  input   wire             ap1_done    ,
+  input   wire             ap1_idle    ,
+  input   wire             ap1_ready   ,
+  output  wire             ap1_start   ,
+  output  wire  [15 : 0]   ap1_arg1_V  ,
+  output  wire  [15 : 0]   ap1_arg2_V  ,
+  output  wire  [15 : 0]   ap1_arg3_V  ,
+  // -----------------------------------
+  input   wire             ap2_done    ,
+  input   wire             ap2_idle    ,
+  input   wire             ap2_ready   ,
+  output  wire             ap2_start   ,
+  output  wire  [15 : 0]   ap2_arg1_V  ,
+  output  wire  [15 : 0]   ap2_arg2_V  ,
+  output  wire  [15 : 0]   ap2_arg3_V  ,
+  // -----------------------------------
+  input   wire             ap3_done    ,
+  input   wire             ap3_idle    ,
+  input   wire             ap3_ready   ,
+  output  wire             ap3_start   ,
+  output  wire  [15 : 0]   ap3_arg1_V  ,
+  output  wire  [15 : 0]   ap3_arg2_V  ,
+  output  wire  [15 : 0]   ap3_arg3_V  ,
+  // -----------------------------------
+  input   wire             ap4_done    ,
+  input   wire             ap4_idle    ,
+  input   wire             ap4_ready   ,
+  output  wire             ap4_start   ,
+  output  wire  [15 : 0]   ap4_arg1_V  ,
+  output  wire  [15 : 0]   ap4_arg2_V  ,
+  output  wire  [15 : 0]   ap4_arg3_V  ,
+  // -----------------------------------
+  input   wire             ap5_done    ,
+  input   wire             ap5_idle    ,
+  input   wire             ap5_ready   ,
+  output  wire             ap5_start   ,
+  output  wire  [15 : 0]   ap5_arg1_V  ,
+  output  wire  [15 : 0]   ap5_arg2_V  ,
+  output  wire  [15 : 0]   ap5_arg3_V  ,
+  // -----------------------------------
+  input   wire             ap6_done    ,
+  input   wire             ap6_idle    ,
+  input   wire             ap6_ready   ,
+  output  wire             ap6_start   ,
+  output  wire  [15 : 0]   ap6_arg1_V  ,
+  output  wire  [15 : 0]   ap6_arg2_V  ,
+  output  wire  [15 : 0]   ap6_arg3_V  ,
+  // -----------------------------------
+  input   wire             ap7_done    ,
+  input   wire             ap7_idle    ,
+  input   wire             ap7_ready   ,
+  output  wire             ap7_start   ,
+  output  wire  [15 : 0]   ap7_arg1_V  ,
+  output  wire  [15 : 0]   ap7_arg2_V  ,
+  output  wire  [15 : 0]   ap7_arg3_V  ,
+  // -----------------------------------
+  input   wire             ap8_done    ,
+  input   wire             ap8_idle    ,
+  input   wire             ap8_ready   ,
+  output  wire             ap8_start   ,
+  output  wire  [15 : 0]   ap8_arg1_V  ,
+  output  wire  [15 : 0]   ap8_arg2_V  ,
+  output  wire  [15 : 0]   ap8_arg3_V  ,
+  // -----------------------------------
+  input   wire             ACLK        ,
   input   wire             ARESETN
 );
   wire             w1cA_tready  ;
@@ -287,14 +351,30 @@ module jit_switch #(
   wire             w8cC_tvalid  ;
   wire  [31 : 0]   w8cC_tdata   ;
 
-  wire  [ 3 : 0]   wCONF1       ;
-  wire  [ 3 : 0]   wCONF2       ;
-  wire  [ 3 : 0]   wCONF3       ;
-  wire  [ 3 : 0]   wCONF4       ;
-  wire  [ 3 : 0]   wCONF5       ;
-  wire  [ 3 : 0]   wCONF6       ;
-  wire  [ 3 : 0]   wCONF7       ;
-  wire  [ 3 : 0]   wCONF8       ;
+  wire  [ 3 : 0]   acc1_A1      ;
+  wire  [ 3 : 0]   acc1_B1      ;
+  wire  [ 3 : 0]   acc1_C1      ;
+  wire  [ 3 : 0]   acc2_A1      ;
+  wire  [ 3 : 0]   acc2_B1      ;
+  wire  [ 3 : 0]   acc2_C1      ;
+  wire  [ 3 : 0]   acc3_A1      ;
+  wire  [ 3 : 0]   acc3_B1      ;
+  wire  [ 3 : 0]   acc3_C1      ;
+  wire  [ 3 : 0]   acc4_A1      ;
+  wire  [ 3 : 0]   acc4_B1      ;
+  wire  [ 3 : 0]   acc4_C1      ;
+  wire  [ 3 : 0]   acc5_A1      ;
+  wire  [ 3 : 0]   acc5_B1      ;
+  wire  [ 3 : 0]   acc5_C1      ;
+  wire  [ 3 : 0]   acc6_A1      ;
+  wire  [ 3 : 0]   acc6_B1      ;
+  wire  [ 3 : 0]   acc6_C1      ;
+  wire  [ 3 : 0]   acc7_A1      ;
+  wire  [ 3 : 0]   acc7_B1      ;
+  wire  [ 3 : 0]   acc7_C1      ;
+  wire  [ 3 : 0]   acc8_A1      ;
+  wire  [ 3 : 0]   acc8_B1      ;
+  wire  [ 3 : 0]   acc8_C1      ;
 //       _    ____ ____           ____
 //      / \  / ___/ ___|___   _  |___ \
 //     / _ \| |  | |   / __| (_)   __) |
@@ -331,7 +411,7 @@ generate if (NUM_ACCs == 2) begin
     .mAccOutB_tready  (m1B_tready   ),
     .mAccOutB_tvalid  (m1B_tvalid   ),
     .mAccOutB_tdata   (m1B_tdata    ),
-    .CONF             (wCONF1       ),
+    .CONF             (acc1_C1      ),
     .ACLK             (ACLK         ),
     .ARESETN          (ARESETN      )
   );
@@ -364,19 +444,14 @@ generate if (NUM_ACCs == 2) begin
     .mAccOutB_tready  (m2B_tready   ),
     .mAccOutB_tvalid  (m2B_tvalid   ),
     .mAccOutB_tdata   (m2B_tdata    ),
-    .CONF             (wCONF2       ),
+    .CONF             (acc2_C1      ),
     .ACLK             (ACLK         ),
     .ARESETN          (ARESETN      )
   );
 
   jit_crossbar #(2) u_crossbar (
-    .sCMD_tready   (sCMD_tready     ),
-    .sCMD_tvalid   (sCMD_tvalid     ),
-    .sCMD_tdata    (sCMD_tdata      ),
-    .mRSP_tready   (mRSP_tready     ),
-    .mRSP_tvalid   (mRSP_tvalid     ),
-    .mRSP_tdata    (mRSP_tdata      ),
-    .CONF1         (wCONF1          ),
+    .CONF1_A       (acc1_A1         ),
+    .CONF1_B       (acc1_B1         ),
     .sC1_tready    (w1cC_tready     ),
     .sC1_tvalid    (w1cC_tvalid     ),
     .sC1_tdata     (w1cC_tdata      ),
@@ -386,7 +461,8 @@ generate if (NUM_ACCs == 2) begin
     .mB1_tready    (w1cB_tready     ),
     .mB1_tvalid    (w1cB_tvalid     ),
     .mB1_tdata     (w1cB_tdata      ),
-    .CONF2         (wCONF2          ),
+    .CONF2_A       (acc2_A1         ),
+    .CONF2_B       (acc2_B1         ),
     .sC2_tready    (w2cC_tready     ),
     .sC2_tvalid    (w2cC_tvalid     ),
     .sC2_tdata     (w2cC_tdata      ),
@@ -396,7 +472,8 @@ generate if (NUM_ACCs == 2) begin
     .mB2_tready    (w2cB_tready     ),
     .mB2_tvalid    (w2cB_tvalid     ),
     .mB2_tdata     (w2cB_tdata      ),
-    .CONF3         (wCONF3          ),
+    .CONF3_A       (acc3_A1         ),
+    .CONF3_B       (acc3_B1         ),
     .sC3_tready    (w3cC_tready     ),
     .sC3_tvalid    ( 1'd0           ),
     .sC3_tdata     (32'd0           ),
@@ -406,7 +483,8 @@ generate if (NUM_ACCs == 2) begin
     .mB3_tready    ( 1'd0           ),
     .mB3_tvalid    (w3cB_tvalid     ),
     .mB3_tdata     (w3cB_tdata      ),
-    .CONF4         (wCONF4          ),
+    .CONF4_A       (acc4_A1         ),
+    .CONF4_B       (acc4_B1         ),
     .sC4_tready    (w4cC_tready     ),
     .sC4_tvalid    ( 1'd0           ),
     .sC4_tdata     (32'd0           ),
@@ -416,7 +494,8 @@ generate if (NUM_ACCs == 2) begin
     .mB4_tready    ( 1'd0           ),
     .mB4_tvalid    (w4cB_tvalid     ),
     .mB4_tdata     (w4cB_tdata      ),
-    .CONF5         (wCONF5          ),
+    .CONF5_A       (acc5_A1         ),
+    .CONF5_B       (acc5_B1         ),
     .sC5_tready    (w5cC_tready     ),
     .sC5_tvalid    ( 1'd0           ),
     .sC5_tdata     (32'd0           ),
@@ -426,7 +505,8 @@ generate if (NUM_ACCs == 2) begin
     .mB5_tready    ( 1'd0           ),
     .mB5_tvalid    (w5cB_tvalid     ),
     .mB5_tdata     (w5cB_tdata      ),
-    .CONF6         (wCONF6          ),
+    .CONF6_A       (acc6_A1         ),
+    .CONF6_B       (acc6_B1         ),
     .sC6_tready    (w6cC_tready     ),
     .sC6_tvalid    ( 1'd0           ),
     .sC6_tdata     (32'd0           ),
@@ -436,7 +516,8 @@ generate if (NUM_ACCs == 2) begin
     .mB6_tready    ( 1'd0           ),
     .mB6_tvalid    (w6cB_tvalid     ),
     .mB6_tdata     (w6cB_tdata      ),
-    .CONF7         (wCONF7          ),
+    .CONF7_A       (acc7_A1         ),
+    .CONF7_B       (acc7_B1         ),
     .sC7_tready    (w7cC_tready     ),
     .sC7_tvalid    ( 1'd0           ),
     .sC7_tdata     (32'd0           ),
@@ -446,7 +527,8 @@ generate if (NUM_ACCs == 2) begin
     .mB7_tready    ( 1'd0           ),
     .mB7_tvalid    (w7cB_tvalid     ),
     .mB7_tdata     (w7cB_tdata      ),
-    .CONF8         (wCONF8          ),
+    .CONF8_A       (acc8_A1         ),
+    .CONF8_B       (acc8_B1         ),
     .sC8_tready    (w8cC_tready     ),
     .sC8_tvalid    ( 1'd0           ),
     .sC8_tdata     (32'd0           ),
@@ -460,9 +542,101 @@ generate if (NUM_ACCs == 2) begin
     .ARESETN       (ARESETN         )
   );
 
+jit_dispatch #(2) u_dispatch(
+  .sR_tready  (sCMD_tready ),
+  .sR_tvalid  (sCMD_tvalid ),
+  .sR_tdata   (sCMD_tdata  ),
+  .mR_tready  (mRSP_tready ),
+  .mR_tvalid  (mRSP_tvalid ),
+  .mR_tdata   (mRSP_tdata  ),
+  .acc1_A1    (acc1_A1     ),
+  .acc1_B1    (acc1_B1     ),
+  .acc1_C1    (acc1_C1     ),
+  .acc1_R1    (ap1_arg1_V  ),
+  .acc1_R2    (ap1_arg2_V  ),
+  .acc1_R3    (ap1_arg3_V  ),
+  .acc1_done  (ap1_done    ),
+  .acc1_idle  (ap1_idle    ),
+  .acc1_ready (ap1_ready   ),
+  .acc1_start (ap1_start   ),
+  .acc2_A1    (acc2_A1     ),
+  .acc2_B1    (acc2_B1     ),
+  .acc2_C1    (acc2_C1     ),
+  .acc2_R1    (ap2_arg1_V  ),
+  .acc2_R2    (ap2_arg2_V  ),
+  .acc2_R3    (ap2_arg3_V  ),
+  .acc2_done  (ap2_done    ),
+  .acc2_idle  (ap2_idle    ),
+  .acc2_ready (ap2_ready   ),
+  .acc2_start (ap2_start   ),
+  .acc3_A1    (acc3_A1     ),
+  .acc3_B1    (acc3_B1     ),
+  .acc3_C1    (acc3_C1     ),
+  .acc3_R1    (ap3_arg1_V  ),
+  .acc3_R2    (ap3_arg2_V  ),
+  .acc3_R3    (ap3_arg3_V  ),
+  .acc3_done  (ap3_done    ),
+  .acc3_idle  (ap3_idle    ),
+  .acc3_ready (ap3_ready   ),
+  .acc3_start (ap3_start   ),
+  .acc4_A1    (acc4_A1     ),
+  .acc4_B1    (acc4_B1     ),
+  .acc4_C1    (acc4_C1     ),
+  .acc4_R1    (ap4_arg1_V  ),
+  .acc4_R2    (ap4_arg2_V  ),
+  .acc4_R3    (ap4_arg3_V  ),
+  .acc4_done  (ap4_done    ),
+  .acc4_idle  (ap4_idle    ),
+  .acc4_ready (ap4_ready   ),
+  .acc4_start (ap4_start   ),
+  .acc5_A1    (acc5_A1     ),
+  .acc5_B1    (acc5_B1     ),
+  .acc5_C1    (acc5_C1     ),
+  .acc5_R1    (ap5_arg1_V  ),
+  .acc5_R2    (ap5_arg2_V  ),
+  .acc5_R3    (ap5_arg3_V  ),
+  .acc5_done  (ap5_done    ),
+  .acc5_idle  (ap5_idle    ),
+  .acc5_ready (ap5_ready   ),
+  .acc5_start (ap5_start   ),
+  .acc6_A1    (acc6_A1     ),
+  .acc6_B1    (acc6_B1     ),
+  .acc6_C1    (acc6_C1     ),
+  .acc6_R1    (ap6_arg1_V  ),
+  .acc6_R2    (ap6_arg2_V  ),
+  .acc6_R3    (ap6_arg3_V  ),
+  .acc6_done  (ap6_done    ),
+  .acc6_idle  (ap6_idle    ),
+  .acc6_ready (ap6_ready   ),
+  .acc6_start (ap6_start   ),
+  .acc7_A1    (acc7_A1     ),
+  .acc7_B1    (acc7_B1     ),
+  .acc7_C1    (acc7_C1     ),
+  .acc7_R1    (ap7_arg1_V  ),
+  .acc7_R2    (ap7_arg2_V  ),
+  .acc7_R3    (ap7_arg3_V  ),
+  .acc7_done  (ap7_done    ),
+  .acc7_idle  (ap7_idle    ),
+  .acc7_ready (ap7_ready   ),
+  .acc7_start (ap7_start   ),
+  .acc8_A1    (acc8_A1     ),
+  .acc8_B1    (acc8_B1     ),
+  .acc8_C1    (acc8_C1     ),
+  .acc8_R1    (ap8_arg1_V  ),
+  .acc8_R2    (ap8_arg2_V  ),
+  .acc8_R3    (ap8_arg3_V  ),
+  .acc8_done  (ap8_done    ),
+  .acc8_idle  (ap8_idle    ),
+  .acc8_ready (ap8_ready   ),
+  .acc8_start (ap8_start   ),
+  .ACLK       (ACLK        ),
+  .ARESETN    (ARESETN     )
+);
+
 end
 endgenerate // NUM_ACCs == 2
 
+/*
 //       _    ____ ____           _  _
 //      / \  / ___/ ___|___   _  | || |
 //     / _ \| |  | |   / __| (_) | || |_
@@ -696,7 +870,7 @@ generate if (NUM_ACCs == 4) begin
 
 end
 endgenerate // NUM_ACCs == 4
-
+*/
 
 
 

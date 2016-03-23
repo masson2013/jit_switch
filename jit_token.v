@@ -107,7 +107,10 @@ module jit_token(
 
       state[START] : begin
         if (!ap_done) next[START] = 1'b1;
-        else          next[FETCH] = 1'b1;
+        else begin
+          rcmd        = 32'd0;
+          next[FETCH] = 1'b1;
+        end
       end
 
       state[IDLE] : begin
