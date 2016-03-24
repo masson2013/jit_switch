@@ -794,13 +794,13 @@ generate if (NUM_ACCs == 4) begin
       end
 
       state_acc[ACC3] : begin
-        if (acc3_done) next_acc[DONE3] = 1'b1;
-        else           next_acc[ACC4] = 1'b1;
+        if (racc3_done) next_acc[DONE3] = 1'b1;
+        else            next_acc[ACC4] = 1'b1;
       end
 
       state_acc[ACC4] : begin
-        if (acc4_done) next_acc[DONE4] = 1'b1;
-        else           next_acc[ACC1] = 1'b1;
+        if (racc4_done) next_acc[DONE4] = 1'b1;
+        else            next_acc[ACC1] = 1'b1;
       end
 
       state_acc[DONE1] : begin
@@ -917,7 +917,7 @@ endgenerate
 //    / ___ \ |__| |___\__ \  _  | (_) |
 //   /_/   \_\____\____|___/ (_)  \___/
 //
-generate if (NUM_ACCs == 4) begin
+generate if (NUM_ACCs == 8) begin
   reg    [ 3 : 0]    racc1_A1   ;
   reg    [ 3 : 0]    racc1_B1   ;
   reg    [ 3 : 0]    racc1_C1   ;
@@ -1417,7 +1417,7 @@ generate if (NUM_ACCs == 4) begin
       racc5_R2 <= 16'd0;
     end
     else begin
-      if (state[TYPEC] == 1'b1 && wacc5 == 4'd5 && wREGn == 4'd2)
+      if (state[TYPEC] == 1'b1 && wACCn == 4'd5 && wREGn == 4'd2)
         racc5_R2 <= wVALUE;
     end
   end
@@ -1428,7 +1428,7 @@ generate if (NUM_ACCs == 4) begin
       racc5_R3 <= 16'd0;
     end
     else begin
-      if (state[TYPEC] == 1'b1 && wacc5 == 4'd5 && wREGn == 4'd3)
+      if (state[TYPEC] == 1'b1 && wACCn == 4'd5 && wREGn == 4'd3)
         racc5_R3 <= wVALUE;
     end
   end
@@ -1556,33 +1556,33 @@ generate if (NUM_ACCs == 4) begin
       end
 
       state_acc[ACC3] : begin
-        if (acc3_done) next_acc[DONE3] = 1'b1;
-        else           next_acc[ACC4] = 1'b1;
+        if (racc3_done) next_acc[DONE3] = 1'b1;
+        else            next_acc[ACC4] = 1'b1;
       end
 
       state_acc[ACC4] : begin
-        if (acc4_done) next_acc[DONE4] = 1'b1;
-        else           next_acc[ACC5] = 1'b1;
+        if (racc4_done) next_acc[DONE4] = 1'b1;
+        else            next_acc[ACC5] = 1'b1;
       end
 
       state_acc[ACC5] : begin
-        if (acc5_done) next_acc[DONE5] = 1'b1;
-        else           next_acc[ACC6] = 1'b1;
+        if (racc5_done) next_acc[DONE5] = 1'b1;
+        else            next_acc[ACC6] = 1'b1;
       end
 
       state_acc[ACC6] : begin
-        if (acc6_done) next_acc[DONE6] = 1'b1;
-        else           next_acc[ACC7] = 1'b1;
+        if (racc6_done) next_acc[DONE6] = 1'b1;
+        else            next_acc[ACC7] = 1'b1;
       end
 
       state_acc[ACC7] : begin
-        if (acc7_done) next_acc[DONE7] = 1'b1;
-        else           next_acc[ACC8] = 1'b1;
+        if (racc7_done) next_acc[DONE7] = 1'b1;
+        else            next_acc[ACC8] = 1'b1;
       end
 
       state_acc[ACC8] : begin
-        if (acc8_done) next_acc[DONE8] = 1'b1;
-        else           next_acc[ACC1] = 1'b1;
+        if (racc8_done) next_acc[DONE8] = 1'b1;
+        else            next_acc[ACC1] = 1'b1;
       end
 
       state_acc[DONE1] : begin

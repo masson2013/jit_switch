@@ -968,7 +968,7 @@ endgenerate // NUM_ACCs == 8
 //    / ___ \ |__| |___\__ \  _  | (_) |
 //   /_/   \_\____\____|___/ (_)  \___/
 //
-generate if (NUM_ACCs == 4) begin
+generate if (NUM_ACCs == 8) begin
 
   jit_couple u_acc1_couple (
     .sInA_tready      (s1A_tready   ),
